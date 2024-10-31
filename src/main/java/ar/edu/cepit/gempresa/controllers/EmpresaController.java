@@ -1,5 +1,9 @@
 package ar.edu.cepit.gempresa.controllers;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +28,31 @@ public class EmpresaController {
         this.empresaService = empresaService;
     }
 
+    @GetMapping("")
+    public ResponseEntity<Map<String, Object>> getAllEmpresas() {
+        List<Empresa> empresa = this.empresaService.getAllEmpresas();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", empresa);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+    
+
 
     @GetMapping(value="/{codigoEmpresa}/details", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Empresa> getDetalleEmpresa(
+    public ResponseEntity<Map<String, Object>> getDetalleEmpresa(
         @PathVariable(name = "codigoEmpresa") String codigoEmpresa
     ) {
         Empresa emp = this.empresaService.getDetalleEmpresa(codigoEmpresa);
-        return new ResponseEntity<Empresa>(emp, HttpStatus.OK);
+
+        Map<String, Object> response = new HashMap<>();
+        if(emp == null){
+            response.put("error", "Recurso no encontrado");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+
+        response.put("data", emp);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
